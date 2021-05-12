@@ -14,19 +14,3 @@ from django.core.asgi import get_asgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
 application = get_asgi_application()
-
-from channels.routing import ProtocolTypeRouter,URLRouter
-from channels.auth import AuthMiddlewareStack
-from django.urls import path
-from home.consumers import StateProgress
-ws_pattern= [
-  
-   path('ws/progress/',StateProgress),
-
-]
-
-application= ProtocolTypeRouter(
-    {
-        'websocket':AuthMiddlewareStack(URLRouter(ws_pattern))
-    }
-)

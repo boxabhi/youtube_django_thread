@@ -6,69 +6,92 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <script src="https://unpkg.com/file-upload-with-preview@4.1.0/dist/file-upload-with-preview.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css"
+        href="https://unpkg.com/file-upload-with-preview@4.1.0/dist/file-upload-with-preview.min.css" />
 </head>
 
 <body>
 
 
     <div class="container mt-5 pt-5">
-        <p id="percentage"></p>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
-                </tr>
-            </thead>
-            <tbody id="render_table">
+
+        <div class="text-center">
+            <h2>Create Information form</h2>
+        </div>
+        <form method="post" id="myUniqueUploadId" enctype="multipart/form-data">
+            {% csrf_token %} 
+            <div class="row" >
+                <div class="form-group col-md-8">
+                    <label>Add Skills</label>
+                    <input class="form-control" required name="skills" type="text" placeholder="Enter Skills">
+                </div>
+                <div class="form-group col-md-4 mt-4">
+                    <button type="button" onclick="addInputForSkills()" class="btn btn-success">Add Skills</button>
+
+                </div>
               
-               
-            </tbody>
-        </table>
+            </div>
+            <div id="skill_row">
+
+            </div>
+                
+
+            <div class="custom-file-container mt-4" data-upload-id="myUniqueUploadId">
+                <label>Upload File
+                    <a href="javascript:void(0)" class="custom-file-container__image-clear"
+                        title="Clear Image">&times;</a></label>
+                <label class="custom-file-container__custom-file">
+                    <input type="file" name="images" class="custom-file-container__custom-file__custom-file-input" accept="*" multiple
+                        aria-label="Choose File" />
+                    <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+                    <span class="custom-file-container__custom-file__custom-file-control"></span>
+                </label>
+                <div class="custom-file-container__image-preview"></div>
+            </div>
+    
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+
     </div>
 
+    
 
 
     <script type="text/javascript">
-        let socket = new WebSocket('ws://localhost:8000/ws/progress/');
-        socket.onopen = function (e) {
-            console.log('Connection established');
-        };
-        socket.onmessage = function (e) {
-            var data = JSON.parse(e.data)
-            var value = data.payload.progress
-            increaseProgress(data.payload.count , data.payload.current)
-            renderTable(data.payload.data)
+        var upload = new FileUploadWithPreview("myUniqueUploadId");
+        var current_count_for_skills = 0
 
-        };
+        function addInputForSkills(){
 
-        function renderTable(data) {
-            var table = document.getElementById("render_table");
-            
-            var html = `  <tr>
-                    <th scope="row">${data.student_name}</th>
-                    <td>${data.student_email}</td>
-                    <td>${data.address}</td>
-                
-                </tr>
-            `
-            table.innerHTML += html
+
+            var html = ` 
+            <div class="row mt-3" id="input_skill_${current_count_for_skills}"> 
+            <div class="form-group col-md-8">
+                    <label>Add Skills</label>
+                    <input class="form-control" required name="skills" type="text" placeholder="Enter Skills">
+                </div>
+                <div class="form-group col-md-4 mt-4">
+                    <button type="button" onclick="removeSkillInput(${current_count_for_skills})" class="btn btn-danger" id>Delete</button>
+                </div>
+                </div>`
+
+            document.getElementById('skill_row').innerHTML += html
+
+            current_count_for_skills++
         }
 
-        function increaseProgress( total , current ) {
-            var progress = document.querySelector('.progress-bar')
-            var percentage = current * (total/100)
-            console.log(percentage)
-            progress.style.width = percentage + "%"
-            document.getElementById('percentage').innerHTML = `${current} % completed` 
+        function removeSkillInput(id) {
+
+            var element = document.getElementById(`input_skill_${id}`);
+            element.remove()
+
         }
+
     </script>
 </body>
 
